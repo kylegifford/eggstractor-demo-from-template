@@ -59,10 +59,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `🎉 **Preview Deployed!**
-              👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}" target="_blank">View Preview</a>`
-            })
+            if(context.issue && context.issue.number){
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `🎉 **Preview Deployed!**
+                👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}" target="_blank">View Preview</a>`
+              });
+            }
