@@ -26,6 +26,8 @@ jobs:
     environment:
       name: "preview-${{ github.ref_name }}"
       url: "${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}"
+    outputs:
+      deploy_path: ${{ steps.build-publish.outputs.deploy_path }}
     steps:
       - id: build-publish
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
