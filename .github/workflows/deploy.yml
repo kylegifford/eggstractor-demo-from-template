@@ -44,7 +44,7 @@ jobs:
     needs: setup
     environment:
       name: "preview-${{ needs.setup.outputs.deploy_path }}"
-      url: "${{ steps.build-publish.outputs.page_url }}/${{ needs.setup.outputs.deploy_path }}"
+      url: "${{ steps.build-publish.outputs.page_url }}${{ needs.setup.outputs.deploy_path }}"
     steps:
       - id: build-publish
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
