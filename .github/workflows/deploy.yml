@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: "preview-${{ github.ref_name }}"
-      url: "${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.page_url }}"
+      url: "${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}"
     steps:
       - id: build-publish
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
@@ -66,6 +66,6 @@ jobs:
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
                 body: `🎉 **Preview Deployed!**
-                👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.page_url }}" target="_blank">View Preview</a>`
+                👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}" target="_blank">View Preview</a>`
               });
             }
