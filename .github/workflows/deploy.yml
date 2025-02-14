@@ -2,13 +2,15 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ['*']
+
   pull_request:
-    branches: ['main']
+    branches:
+      - main
 
 # Add concurrency settings
+# tack on branch name to allow for cross-branch concurrency
 concurrency: 
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -22,8 +24,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment:
-      name: 'preview-${{ github.ref_name }}'
-      url: '${{ steps.build-publish.outputs.page_url }}'
+      name: "preview-${{ github.ref_name }}"
+      url: ${{ steps.build-publish.outputs.page_url }}
     steps:
       - id: build-publish
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
@@ -32,30 +34,29 @@ jobs:
           build_command: |
             npm run build
 
+            BUILD_PATH=preview-out
+
             # Replace slashes with dashes in branch name
             if [ "${{ github.event_name }}" == "pull_request" ]; then
               BRANCH_NAME="${{ github.head_ref }}"
             else
-              BRANCH_NAME="${GITHUB_REF_NAME}"
+              BRANCH_NAME="${{ github.ref_name }}"
             fi
             
             # Replace slashes with dashes for safety
             DEPLOY_PATH="${BRANCH_NAME//\//-}"
-            echo "deploy_path=${DEPLOY_PATH}" >> $GITHUB_OUTPUT
+            echo "deploy_path=${DEPLOY_PATH}" >> $GITHUB_ENV
             
             # Create preview directory structure
-            mkdir -p "preview-out/${DEPLOY_PATH}"
-            cp -r dist/* "preview-out/${DEPLOY_PATH}/"
+            mkdir -p "$BUILD_PATH/${DEPLOY_PATH}"
+            cp -r dist/* "$BUILD_PATH/${DEPLOY_PATH}/"
             
             # Copy 404.html to root for routing
-            cp dist/404.html preview-out/
+            cp dist/404.html $BUILD_PATH/
 
 
       - name: Comment on PR
-        # if: |
-        #   github.event_name == 'pull_request' && 
-        #   steps.deploy.conclusion == 'success' && 
-        #   steps.wait-for-pages.conclusion == 'success'
+        if: success() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
@@ -65,6 +66,6 @@ jobs:
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
                 body: `🎉 **Preview Deployed!**
-                👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}" target="_blank">View Preview</a>`
+                👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ env.deploy_path }}" target="_blank">View Preview</a>`
               });
             }
