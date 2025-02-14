@@ -64,7 +64,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `🎉 **Preview Deployed!**
-                👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}" target="_blank">View Preview</a>`
-              });
+                body: |
+                  🎉 **Preview Deployed!**
+                  👉 <a href="${{ steps.build-publish.outputs.page_url }}/${{ steps.build-publish.outputs.deploy_path }}" target="_blank">View Preview</a>              });
             }
